@@ -1,95 +1,92 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
+interface UserProfile {
+  display_name: string;
+  images: { url: string }[];
+  id: string;
+  email: string;
+  external_urls: { spotify: string };
+  href: string;
+  country: string;
+}
+
+const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
+const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!;
+const scope = "user-read-private user-read-email";
+
 export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [accessToken, setAccesstoken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      setAccesstoken(token);
+      fetchUserProfile(token);
+    }
+  }, []);
+
+  const generateCodeVerifier = () => {
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const randomValues = crypto.getRandomValues(new Uint8Array(64));
+    return Array.from(randomValues).map(x => possible[x % possible.length]).join("");
+  }
+
+  const generateCodeChallenge = async () => {
+    const codeVerifier = generateCodeVerifier();
+    localStorage.setItem("codeVerifier", codeVerifier);
+
+    const data = new TextEncoder().encode(codeVerifier);
+    const hashed = await crypto.subtle.digest("SHA-256", data);
+    return btoa(String.fromCharCode(...new Uint8Array(hashed)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  };
+
+  const loginWithSpotify = async () => {
+    const codeChallenge = await generateCodeChallenge();
+    const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    window.location.href = authUrl;
+  };
+
+  const logout = () => {
+    setUser(null);
+    setAccesstoken(null);
+    setRefreshToken(null);
+    setExpiresIn(null);
+    localStorage.removeItem("access_token");
+  };
+
+
+  const fetchUserProfile = async (token: string) => {
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data: UserProfile = await response.json();
+    setUser(data);
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+        {user ? (
+          <div>
+            <h1>Logged in as {user.display_name}</h1>
+            <img width="150" src={user.images?.[0]?.url} alt={user.display_name} />
+            <button onClick={logout}>Log out</button>
+          </div>
+        ) : (
+          <div>
+            <h1>Welcome to the OAuth2 PKCE Example</h1>
+            <button onClick={loginWithSpotify}>Log in with Spotify</button>
+          </div>
+        )}
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
