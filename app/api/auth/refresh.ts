@@ -1,5 +1,4 @@
 "use server";
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
@@ -10,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missins refresh token" }, { status: 400 });
     }
 
-    const clientId = process.env.SPOTFY_CLIENT_ID!;
+    const clientId = process.env.SPOTIFY_CLIENT_ID!;
     const body = new URLSearchParams({
       client_id: clientId,
       grant_type: "refresh_token",

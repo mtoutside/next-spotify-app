@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Profile from "./components/Profile";
 import styles from "./page.module.css";
 
 interface UserProfile {
@@ -22,10 +23,53 @@ export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [accessToken, setAccesstoken] = useState<string | null>(null);
 
+  const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (!refreshToken) {
+      console.error("No refresh token found, loggin out...")
+      logout();
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      const data = await response.json();
+      if (data.access_token && data.expires_in) {
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
+      } else {
+        console.error("Failed to refresh token, log out...");
+        logout();
+      }
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      logout();
+    }
+  }
+
+  useEffect(() => {
+    const expiresAt = Number(localStorage.getItem("expires_at"));
+    const refreshToken = localStorage.getItem("refresh_token");
+
+
+    if (!expiresAt || !refreshToken) return;
+
+    const expiresInMs = expiresAt - Date.now();
+    if (expiresInMs <= 5000) {
+      refreshAccessToken();
+    } else {
+      const timeout = setTimeout(refreshAccessToken, expiresInMs - 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (token) {
-      setAccesstoken(token);
       fetchUserProfile(token);
     }
   }, []);
@@ -56,19 +100,36 @@ export default function Home() {
 
   const logout = () => {
     setUser(null);
-    setAccesstoken(null);
-    setRefreshToken(null);
-    setExpiresIn(null);
-    localStorage.removeItem("access_token");
+    localStorage.clear();
+    router.push("/");
   };
 
 
   const fetchUserProfile = async (token: string) => {
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data: UserProfile = await response.json();
-    setUser(data);
+    try {
+      const response = await fetch("https://api.spotify.com/v1/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        console.error("Failed to fetch user profile", response.status, response.statusText);
+
+        if (response.status === 401 || response.status === 403) {
+          console.error("Unauthorized access. Logging out...")
+          logout();
+        } else {
+          console.error("Server error. Redirecting to home...")
+          router.push("/");
+        }
+        return;
+      }
+
+      const data: UserProfile = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      logout();
+    }
   };
 
   return (
@@ -77,7 +138,7 @@ export default function Home() {
         {user ? (
           <div>
             <h1>Logged in as {user.display_name}</h1>
-            <img width="150" src={user.images?.[0]?.url} alt={user.display_name} />
+            <Profile user={user} />
             <button onClick={logout}>Log out</button>
           </div>
         ) : (
