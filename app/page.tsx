@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Profile from "./components/Profile";
+import { fetchUserProfile } from "./utils/api";
 import styles from "./page.module.css";
 
 interface UserProfile {
@@ -21,7 +22,6 @@ const scope = "user-read-private user-read-email";
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [accessToken, setAccesstoken] = useState<string | null>(null);
 
   const refreshAccessToken = async () => {
     const refreshToken = localStorage.getItem("refresh_token");
@@ -68,10 +68,25 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const fetchData = async () => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-      fetchUserProfile(token);
+    if (!token) {
+      console.error("No access token found, Redirecting to home...");
+      router.push("/");
+      return;
     }
+
+    try {
+      const userData = await fetchUserProfile(token);
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      localStorage.clear();
+      router.push("/");
+    }
+  };
+
+  fetchData();
   }, []);
 
   const generateCodeVerifier = () => {
@@ -102,34 +117,6 @@ export default function Home() {
     setUser(null);
     localStorage.clear();
     router.push("/");
-  };
-
-
-  const fetchUserProfile = async (token: string) => {
-    try {
-      const response = await fetch("https://api.spotify.com/v1/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        console.error("Failed to fetch user profile", response.status, response.statusText);
-
-        if (response.status === 401 || response.status === 403) {
-          console.error("Unauthorized access. Logging out...")
-          logout();
-        } else {
-          console.error("Server error. Redirecting to home...")
-          router.push("/");
-        }
-        return;
-      }
-
-      const data: UserProfile = await response.json();
-      setUser(data);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      logout();
-    }
   };
 
   return (
