@@ -69,24 +69,24 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.error("No access token found, Redirecting to home...");
-      router.push("/");
-      return;
-    }
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        console.error("No access token found, Redirecting to home...");
+        router.push("/");
+        return;
+      }
 
-    try {
-      const userData = await fetchUserProfile(token);
-      setUser(userData);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      localStorage.clear();
-      router.push("/");
-    }
-  };
+      try {
+        const userData = await fetchUserProfile(token);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        localStorage.clear();
+        router.push("/");
+      }
+    };
 
-  fetchData();
+    fetchData();
   }, []);
 
   const generateCodeVerifier = () => {
@@ -126,7 +126,6 @@ export default function Home() {
           <div>
             <h1>Logged in as {user.display_name}</h1>
             <Profile user={user} />
-            <button onClick={logout}>Log out</button>
           </div>
         ) : (
           <div>

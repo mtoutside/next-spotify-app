@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import styles from "./Profile.module.css";
 
 interface UserProfile {
   display_name: string;
@@ -23,7 +24,7 @@ export default function Profile({ user }: ProfileProps) {
     router.push("/");
   };
   return (
-    <>
+    <div className={styles.profile}>
       <h1>Spotify Profile</h1>
       {user ? (
         <>
@@ -59,6 +60,6 @@ export default function Profile({ user }: ProfileProps) {
       ) : (
         <p>Loading...</p>
       )}
-    </>
+    </div>
   );
 }
