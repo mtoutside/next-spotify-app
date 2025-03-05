@@ -21,7 +21,7 @@ export default function Profile({ user }: ProfileProps) {
 
   const logout = () => {
     localStorage.clear();
-    router.push("/");
+    location.reload();
   };
   return (
     <div className={styles.profile}>

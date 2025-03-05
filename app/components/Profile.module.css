@@ -27,6 +27,8 @@
     font-weight: bold;
     background-color:#1ed760;
     color: black;
+    cursor: pointer;
+    transition: background-color 0.2s;
   }
 
   button:hover {
