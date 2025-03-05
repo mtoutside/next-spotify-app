@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missins refresh token" }, { status: 400 });
     }
 
-    const clientId = process.env.SPOTIFY_CLIENT_ID!;
+    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
     const body = new URLSearchParams({
       client_id: clientId,
       grant_type: "refresh_token",
