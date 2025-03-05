@@ -116,7 +116,7 @@ export default function Home() {
   const logout = () => {
     setUser(null);
     localStorage.clear();
-    router.push("/");
+    location.reload();
   };
 
   return (
