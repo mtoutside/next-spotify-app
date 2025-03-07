@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Spotify App",
+  title: "Next.js Spotify app!!",
   description: "A Spotify porofile viewr using Next.js and the Spotify API",
 };
 

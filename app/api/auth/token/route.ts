@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 const tokenEndpoint = "https://accounts.spotify.com/api/token";
 const redirectUrl = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
 const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
-const clientSecret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET!;
 
 export async function POST(req: NextRequest) {
   try {
