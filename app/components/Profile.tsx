@@ -20,7 +20,7 @@ export default function Profile({ user }: ProfileProps) {
   const router = useRouter();
 
   const logout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     location.reload();
   };
   return (

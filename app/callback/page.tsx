@@ -29,7 +29,7 @@ export default function Callback() {
       console.log({ data })
 
       if (data.access_token) {
-        localStorage.setItem("access_token", data.access_token);
+        sessionStorage.setItem("access_token", data.access_token);
         router.push("/");
       } else {
         setError("Failed to obtain access token");
@@ -40,7 +40,7 @@ export default function Callback() {
   };
 
   const saveTokenData = async (code: string) => {
-    const codeVerifier = localStorage.getItem("codeVerifier");
+    const codeVerifier = sessionStorage.getItem("codeVerifier");
     try {
       const response = await fetch("/api/auth/token", {
         method: "POST",
@@ -51,9 +51,9 @@ export default function Callback() {
       console.log({ data })
 
       if (data.access_token && data.refresh_token && data.expires_in) {
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("refresh_token", data.refresh_token);
-        localStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
+        sessionStorage.setItem("access_token", data.access_token);
+        sessionStorage.setItem("refresh_token", data.refresh_token);
+        sessionStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
         router.push("/");
       } else {
         setError("Failed to obtain access token");

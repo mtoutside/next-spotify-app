@@ -24,7 +24,7 @@ export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
 
   const refreshAccessToken = async () => {
-    const refreshToken = localStorage.getItem("refresh_token");
+    const refreshToken = sessionStorage.getItem("refresh_token");
     if (!refreshToken) {
       console.error("No refresh token found, loggin out...")
       logout();
@@ -39,8 +39,8 @@ export default function Home() {
       });
       const data = await response.json();
       if (data.access_token && data.expires_in) {
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
+        sessionStorage.setItem("access_token", data.access_token);
+        sessionStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
       } else {
         console.error("Failed to refresh token, log out...");
         logout();
@@ -52,8 +52,8 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const expiresAt = Number(localStorage.getItem("expires_at"));
-    const refreshToken = localStorage.getItem("refresh_token");
+    const expiresAt = Number(sessionStorage.getItem("expires_at"));
+    const refreshToken = sessionStorage.getItem("refresh_token");
 
 
     if (!expiresAt || !refreshToken) return;
@@ -69,7 +69,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("access_token");
+      const token = sessionStorage.getItem("access_token");
       if (!token) {
         console.error("No access token found, Redirecting to home...");
         router.push("/");
@@ -81,7 +81,7 @@ export default function Home() {
         setUser(userData);
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        localStorage.clear();
+        sessionStorage.clear();
         router.push("/");
       }
     };
@@ -97,7 +97,7 @@ export default function Home() {
 
   const generateCodeChallenge = async () => {
     const codeVerifier = generateCodeVerifier();
-    localStorage.setItem("codeVerifier", codeVerifier);
+    sessionStorage.setItem("codeVerifier", codeVerifier);
 
     const data = new TextEncoder().encode(codeVerifier);
     const hashed = await crypto.subtle.digest("SHA-256", data);
@@ -115,7 +115,7 @@ export default function Home() {
 
   const logout = () => {
     setUser(null);
-    localStorage.clear();
+    sessionStorage.clear();
     location.reload();
   };
 
