@@ -26,7 +26,6 @@ export default function Callback() {
         body: JSON.stringify({ code }),
       });
       const data = await response.json();
-      console.log({ data })
 
       if (data.access_token) {
         sessionStorage.setItem("access_token", data.access_token);
@@ -48,7 +47,6 @@ export default function Callback() {
         body: JSON.stringify({ code, code_verifier: codeVerifier }),
       });
       const data = await response.json();
-      console.log({ data })
 
       if (data.access_token && data.refresh_token && data.expires_in) {
         sessionStorage.setItem("access_token", data.access_token);
@@ -61,7 +59,6 @@ export default function Callback() {
     } catch (err) {
       setError("An error occurred while exchangeing token");
     }
-
   }
 
   return (
