@@ -11,7 +11,7 @@ export default function Callback() {
   useEffect(() => {
     const code = searchParams.get('code');
     if (code) {
-      // exchangeToken(code);
+      exchangeToken(code);
       saveTokenData(code);
     } else {
       setError('No authorization code found');
@@ -34,7 +34,8 @@ export default function Callback() {
         setError('Failed to obtain access token');
       }
     } catch (err) {
-      setError('An error occurred while exchangeing token');
+      setError(`An error occurred while exchangeing token: ${err}`);
+      console.error(err);
     }
   };
 
@@ -57,7 +58,8 @@ export default function Callback() {
         setError('Failed to obtain access token');
       }
     } catch (err) {
-      setError('An error occurred while exchangeing token');
+      setError(`An error occurred while exchangeing token: ${err}`);
+      console.error(err);
     }
   };
 

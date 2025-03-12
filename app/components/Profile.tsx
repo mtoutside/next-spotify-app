@@ -1,5 +1,4 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import styles from './Profile.module.css';
 
 interface UserProfile {
@@ -17,7 +16,6 @@ interface ProfileProps {
 }
 
 export default function Profile({ user }: ProfileProps) {
-  const router = useRouter();
 
   const logout = () => {
     sessionStorage.clear();
