@@ -1,0 +1,17 @@
+#!/bin/sh
+
+pnpm tsc
+
+pnpm pretty-quick
+
+pnpm lint-staged
+
+
+status=$?
+cd $CURRENT
+if [ $status -eq 0 ]; then
+  echo "[pre-commit] success."
+else
+  echo "[pre-commit] found error status."
+  exit 1
+fi

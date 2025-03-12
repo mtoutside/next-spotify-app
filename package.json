@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write app/**/*.{ts,tsx}"
+    "format": "prettier --write app/**/*.{ts,tsx}",
+    "githook:enable": "husky init ./husky",
+    "githook:disable": "git config --unset core.hooksPath",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "15.1.3",

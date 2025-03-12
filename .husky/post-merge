@@ -1,0 +1,8 @@
+#!/bin/sh
+
+is_updated_package=`git diff 'HEAD@{1}' | grep app/package.json`;
+
+if [ -n "$is_updated_package" ] ; then
+  pnpm install
+fi
+
