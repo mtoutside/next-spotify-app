@@ -1,9 +1,9 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Profile from "./components/Profile";
-import { fetchUserProfile } from "./utils/api";
-import styles from "./page.module.css";
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Profile from './components/Profile';
+import { fetchUserProfile } from './utils/api';
+import styles from './page.module.css';
 
 interface UserProfile {
   display_name: string;
@@ -17,44 +17,43 @@ interface UserProfile {
 
 const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
 const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!;
-const scope = "user-read-private user-read-email";
+const scope = 'user-read-private user-read-email';
 
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
 
   const refreshAccessToken = async () => {
-    const refreshToken = sessionStorage.getItem("refresh_token");
+    const refreshToken = sessionStorage.getItem('refresh_token');
     if (!refreshToken) {
-      console.error("No refresh token found, loggin out...")
+      console.error('No refresh token found, loggin out...');
       logout();
       return;
     }
 
     try {
-      const response = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
       const data = await response.json();
       if (data.access_token && data.expires_in) {
-        sessionStorage.setItem("access_token", data.access_token);
-        sessionStorage.setItem("expires_at", (Date.now() + data.expires_in * 1000).toString());
+        sessionStorage.setItem('access_token', data.access_token);
+        sessionStorage.setItem('expires_at', (Date.now() + data.expires_in * 1000).toString());
       } else {
-        console.error("Failed to refresh token, log out...");
+        console.error('Failed to refresh token, log out...');
         logout();
       }
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error('Error refreshing token:', error);
       logout();
     }
-  }
+  };
 
   useEffect(() => {
-    const expiresAt = Number(sessionStorage.getItem("expires_at"));
-    const refreshToken = sessionStorage.getItem("refresh_token");
-
+    const expiresAt = Number(sessionStorage.getItem('expires_at'));
+    const refreshToken = sessionStorage.getItem('refresh_token');
 
     if (!expiresAt || !refreshToken) return;
 
@@ -69,10 +68,10 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = sessionStorage.getItem("access_token");
+      const token = sessionStorage.getItem('access_token');
       if (!token) {
-        console.error("No access token found, Redirecting to home...");
-        router.push("/");
+        console.error('No access token found, Redirecting to home...');
+        router.push('/');
         return;
       }
 
@@ -80,9 +79,9 @@ export default function Home() {
         const userData = await fetchUserProfile(token);
         setUser(userData);
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error('Error fetching user profile:', error);
         sessionStorage.clear();
-        router.push("/");
+        router.push('/');
       }
     };
 
@@ -90,21 +89,23 @@ export default function Home() {
   }, []);
 
   const generateCodeVerifier = () => {
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const randomValues = crypto.getRandomValues(new Uint8Array(64));
-    return Array.from(randomValues).map(x => possible[x % possible.length]).join("");
-  }
+    return Array.from(randomValues)
+      .map((x) => possible[x % possible.length])
+      .join('');
+  };
 
   const generateCodeChallenge = async () => {
     const codeVerifier = generateCodeVerifier();
-    sessionStorage.setItem("codeVerifier", codeVerifier);
+    sessionStorage.setItem('codeVerifier', codeVerifier);
 
     const data = new TextEncoder().encode(codeVerifier);
-    const hashed = await crypto.subtle.digest("SHA-256", data);
+    const hashed = await crypto.subtle.digest('SHA-256', data);
     return btoa(String.fromCharCode(...new Uint8Array(hashed)))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
   };
 
   const loginWithSpotify = async () => {

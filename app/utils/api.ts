@@ -1,7 +1,7 @@
-export const fetchWithAuth = async (url: string, token: string, method = "GET", body?: any) => {
+export const fetchWithAuth = async (url: string, token: string, method = 'GET', body?: any) => {
   const headers: HeadersInit = {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   const options: RequestInit = {
@@ -24,5 +24,5 @@ export const fetchWithAuth = async (url: string, token: string, method = "GET", 
 };
 
 export const fetchUserProfile = async (token: string) => {
-  return fetchWithAuth("https://api.spotify.com/v1/me", token);
+  return fetchWithAuth('https://api.spotify.com/v1/me', token);
 };

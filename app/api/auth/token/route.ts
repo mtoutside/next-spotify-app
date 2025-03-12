@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const tokenEndpoint = "https://accounts.spotify.com/api/token";
+const tokenEndpoint = 'https://accounts.spotify.com/api/token';
 const redirectUrl = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
 const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
 
@@ -34,10 +34,8 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-
   } catch (error) {
     console.error('Error exchanging code for token:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

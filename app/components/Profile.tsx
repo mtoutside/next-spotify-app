@@ -1,6 +1,6 @@
-"use client";
-import { useRouter } from "next/navigation";
-import styles from "./Profile.module.css";
+'use client';
+import { useRouter } from 'next/navigation';
+import styles from './Profile.module.css';
 
 interface UserProfile {
   display_name: string;
@@ -33,7 +33,9 @@ export default function Profile({ user }: ProfileProps) {
               <tr>
                 <td>Display name</td>
                 <td>{user.display_name}</td>
-                <td><img width="150" src={user.images?.[0]?.url} alt={user.display_name} /></td>
+                <td>
+                  <img width="150" src={user.images?.[0]?.url} alt={user.display_name} />
+                </td>
               </tr>
               <tr>
                 <td>Id</td>
