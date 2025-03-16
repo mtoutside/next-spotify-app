@@ -16,7 +16,6 @@ interface ProfileProps {
 }
 
 export default function Profile({ user }: ProfileProps) {
-
   const logout = () => {
     sessionStorage.clear();
     location.reload();
