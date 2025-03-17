@@ -1,7 +1,6 @@
 'use client';
 import styles from './Profile.module.css';
-import { UserProfile } from '@/types';
-
+import { UserProfile } from '@/app/types';
 
 interface ProfileProps {
   user: UserProfile | null;

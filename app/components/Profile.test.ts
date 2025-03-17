@@ -1,15 +1,17 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { it, expect } from 'vitest';
-import  { mockUser } from '@/mocks/server';
-import { UserProfile } from '@/types';
+import { mockUser } from '@/app/mocks/server';
+import { UserProfile } from '@/app/types';
 import Profile from './Profile';
 
+interface ProfileProps {
+  User: UserProfile | null;
+}
+
 it("ユーザー情報を正しく表示する", () => {
-  const props: UserProfile = mockUser;
-  render(<div />);
-  // render(<Profile user={ props } />);
+  const user: ProfileProps = mockUser;
+  render(<Profile user={ user } />);
   expect(screen.getByText("Test User")).toBeInTheDocument();
   expect(screen.getByAltText("Test User")).toHaveAttribute(
     "src",
