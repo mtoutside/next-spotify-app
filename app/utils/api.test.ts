@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fetchUserProfile } from "@/app/utils/api";
+import { fetchUserProfile } from "@/utils/api";
 
 describe("fetchUserProfile", () => {
   it("ユーザーデータを取得できる", async () => {

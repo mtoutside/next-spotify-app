@@ -1,15 +1,7 @@
 'use client';
 import styles from './Profile.module.css';
+import { UserProfile } from '@/types';
 
-interface UserProfile {
-  display_name: string;
-  images: { url: string }[];
-  id: string;
-  email: string;
-  external_urls: { spotify: string };
-  href: string;
-  country: string;
-}
 
 interface ProfileProps {
   user: UserProfile | null;

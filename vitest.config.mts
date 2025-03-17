@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     alias: {
-      "@": path.resolve(__dirname, "./"),
+      "@": path.resolve(__dirname, "app"),
     },
     environment: "jsdom",
     include: ["app/**/*.test.{ts,tsx}"],
