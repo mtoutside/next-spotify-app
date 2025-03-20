@@ -2,10 +2,11 @@
 
 pnpm tsc
 
+pnpm format
+
 pnpm pretty-quick
 
 pnpm lint-staged
-
 
 status=$?
 cd $CURRENT
