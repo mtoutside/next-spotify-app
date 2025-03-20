@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/app/types';
 
 
 export const mockUser: UserProfile = {
