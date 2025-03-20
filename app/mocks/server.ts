@@ -17,3 +17,9 @@ export const server = setupServer(
     return HttpResponse.json(mockUser);
   }),
 );
+
+export const errorHandlers = [
+  http.get("https://api.spotify.com/v1/me", async () => {
+    return new Response(null, { status: 500, statusText: "Internal Server Error" });
+  }),
+];
