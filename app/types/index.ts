@@ -7,4 +7,3 @@ export interface UserProfile {
   href?: string;
   country: string;
 }
-
