@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Profile from './components/Profile';
 import { fetchUserProfile } from './utils/api';
+import { refreshAccessToken } from './utils/auth';
 import styles from './page.module.css';
 
 interface UserProfile {
@@ -22,34 +23,6 @@ const scope = 'user-read-private user-read-email';
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
-
-  const refreshAccessToken = async () => {
-    const refreshToken = sessionStorage.getItem('refresh_token');
-    if (!refreshToken) {
-      console.error('No refresh token found, loggin out...');
-      logout();
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/auth/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-      const data = await response.json();
-      if (data.access_token && data.expires_in) {
-        sessionStorage.setItem('access_token', data.access_token);
-        sessionStorage.setItem('expires_at', (Date.now() + data.expires_in * 1000).toString());
-      } else {
-        console.error('Failed to refresh token, log out...');
-        logout();
-      }
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      logout();
-    }
-  };
 
   useEffect(() => {
     const expiresAt = Number(sessionStorage.getItem('expires_at'));
@@ -71,7 +44,7 @@ export default function Home() {
       const token = sessionStorage.getItem('access_token');
       if (!token) {
         console.error('No access token found, Redirecting to home...');
-        router.push('/');
+        logout();
         return;
       }
 
