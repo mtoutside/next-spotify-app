@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const { refresh_token } = await req.json();
     if (!refresh_token) {
-      return NextResponse.json({ error: 'Missins refresh token' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing refresh token' }, { status: 400 });
     }
 
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;

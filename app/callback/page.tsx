@@ -11,33 +11,12 @@ export default function Callback() {
   useEffect(() => {
     const code = searchParams.get('code');
     if (code) {
-      exchangeToken(code);
       saveTokenData(code);
     } else {
       setError('No authorization code found');
     }
   }, []);
 
-  const exchangeToken = async (code: string) => {
-    try {
-      const response = await fetch('/api/auth/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      const data = await response.json();
-
-      if (data.access_token) {
-        sessionStorage.setItem('access_token', data.access_token);
-        router.push('/');
-      } else {
-        setError('Failed to obtain access token');
-      }
-    } catch (err) {
-      setError(`An error occurred while exchangeing token: ${err}`);
-      console.error(err);
-    }
-  };
 
   const saveTokenData = async (code: string) => {
     const codeVerifier = sessionStorage.getItem('codeVerifier');
@@ -58,7 +37,7 @@ export default function Callback() {
         setError('Failed to obtain access token');
       }
     } catch (err) {
-      setError(`An error occurred while exchangeing token: ${err}`);
+      setError(`An error occurred while exchanging token: ${err}`);
       console.error(err);
     }
   };
