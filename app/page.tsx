@@ -1,6 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import Profile from './components/Profile';
 import { fetchUserProfile } from './utils/api';
 import { refreshAccessToken } from './utils/auth';
@@ -21,8 +20,12 @@ const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!;
 const scope = 'user-read-private user-read-email';
 
 export default function Home() {
-  const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
+
+  const logout = useCallback(() => {
+    setUser(null);
+    sessionStorage.clear();
+  }, []);
 
   useEffect(() => {
     const expiresAt = Number(sessionStorage.getItem('expires_at'));
@@ -43,7 +46,7 @@ export default function Home() {
     const fetchData = async () => {
       const token = sessionStorage.getItem('access_token');
       if (!token) {
-        console.error('No access token found, Redirecting to home...');
+        console.error('No access token found');
         logout();
         return;
       }
@@ -53,13 +56,12 @@ export default function Home() {
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        sessionStorage.clear();
-        router.push('/');
+        logout();
       }
     };
 
     fetchData();
-  }, []);
+  }, [logout]);
 
   const generateCodeVerifier = () => {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -85,12 +87,6 @@ export default function Home() {
     const codeChallenge = await generateCodeChallenge();
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
     window.location.href = authUrl;
-  };
-
-  const logout = () => {
-    setUser(null);
-    sessionStorage.clear();
-    location.reload();
   };
 
   return (
