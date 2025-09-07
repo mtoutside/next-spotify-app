@@ -17,7 +17,6 @@ export default function Callback() {
     }
   }, []);
 
-
   const saveTokenData = async (code: string) => {
     const codeVerifier = sessionStorage.getItem('codeVerifier');
     try {
